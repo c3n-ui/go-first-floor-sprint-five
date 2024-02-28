@@ -99,20 +99,13 @@ type Running struct {
 // Это переопределенный метод Calories() из Training.
 func (r Running) Calories() float64 {
 
-	//Вынесение части формулы для проверки деления на 0.
-	fomulaPartRunningCal := r.Duration.Hours() * MinInHours
-
-	if fomulaPartRunningCal == 0 {
+	//Проверка деления на 0.
+	if r.Duration.Hours() == 0 {
 		fmt.Println("Деление на 0!")
 		return 0
 	}
 
-	if MInKm == 0 {
-		fmt.Println("Деление на 0! Константа MInKm = 0")
-		return 0
-	}
-
-	return ((CaloriesMeanSpeedMultiplier*r.meanSpeed() + CaloriesMeanSpeedShift) * r.Weight / MInKm * fomulaPartRunningCal)
+	return ((CaloriesMeanSpeedMultiplier*r.meanSpeed() + CaloriesMeanSpeedShift) * r.Weight / MInKm * r.Duration.Hours() * MinInHours)
 }
 
 // Константы для расчета потраченных килокалорий при ходьбе.
@@ -136,15 +129,13 @@ type Walking struct {
 func (w Walking) Calories() float64 {
 	speedInMPerS := w.meanSpeed() * KmHInMsec
 
-	//Вынесение части формулы для проверки деления на 0.
-	fomulaPartWalkingCal := w.Height / CmInM
-
-	if fomulaPartWalkingCal == 0 {
+	//Проверка деления на 0.
+	if w.Height == 0 {
 		fmt.Println("Деление на 0!")
 		return 0
 	}
 
-	return ((CaloriesWeightMultiplier*w.Weight + (math.Pow(speedInMPerS, 2)/fomulaPartWalkingCal)*CaloriesSpeedHeightMultiplier*w.Weight) * w.Duration.Hours() * MinInHours)
+	return ((CaloriesWeightMultiplier*w.Weight + (math.Pow(speedInMPerS, 2)/(w.Height/CmInM))*CaloriesSpeedHeightMultiplier*w.Weight) * w.Duration.Hours() * MinInHours)
 }
 
 // Константы для расчета потраченных килокалорий при плавании.
@@ -169,12 +160,6 @@ func (s Swimming) meanSpeed() float64 {
 	//Проверка деления на 0.
 	if s.Duration.Hours() == 0 {
 		fmt.Printf("Деление на 0! Длительность тренировки %s = 0\n", s.Training.TrainingType)
-		return 0
-	}
-
-	//Проверка деления на 0.
-	if MInKm == 0 {
-		fmt.Println("Деление на 0! Константа MInKm = 0")
 		return 0
 	}
 
